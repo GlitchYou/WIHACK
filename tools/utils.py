@@ -210,3 +210,9 @@ def openbrowser(url, new=2):
     from webbrowser import open
 
     open(url, new=new)
+
+
+def sysname():
+    from platform import system
+
+    return system()

