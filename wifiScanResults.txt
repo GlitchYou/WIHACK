@@ -1,0 +1,1 @@
+[{'bssid': '00:2a:3c:7a:98:91', 'ssid': 'NetWork', 'frequency': 2412, 'level': -62, 'capabilities': '[WPA2-PSK-CCMP][ESS]'}, {'bssid': '18:0e:8c:83:47:18', 'ssid': 'NET', 'frequency': 2462, 'level': -77, 'capabilities': '[WPA2-PSK-CCMP][ESS][WPS]'}]

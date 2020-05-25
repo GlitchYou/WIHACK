@@ -1,67 +1,61 @@
-import androidhelper
-droid = androidhelper.Android()
+from tools.utils import edfile, reif, reg, cl
+from tools.design import read_int, menu_simples
+
+try:
+    import androidhelper
+    droid = androidhelper.Android()
+except ImportError:
+    try:
+        import android
+        droid = android.Android()
+    except ImportError:
+        nets = edfile('wifiScanResults.txt')
+        nets = eval(nets)
 
 
-# Padrao usando apenas o mac
+# Padrão usando apenas o mac
 
-def_bid = [
-        
-'00:XX:XX:XX:XX:XX',
-'00:00:XX:XX:XX:XX',
-'xx:xx:xx:xx:xx:xx'
-        
-]
-	
+def_bid = ['00:XX:XX:XX:XX:XX',
+           '00:00:XX:XX:XX:XX',
+           'xx:xx:xx:xx:xx:xx']
+
 
 # Padrao usando apenas o mac + nome
-	
-def_eid = [
-        
-'00:XX:XX:XX:00:00 VIVO-XXXX',
-# '00:xx:xx:00:00:xx VIVO-xxxx-0G',
-# '00:xx:xx:00:00:xx CLARO-xxxx-0G',
-'00:XX:XX:XX:00:00 GVT-XXXX',
-'00:00:XX:00:00:00 NET_0GXXXXXX',
-'00:00:XX:00:00:00 CLARO_0GXXXXXX'
-        
-]
+
+def_eid = ['00:XX:XX:XX:00:00 VIVO-XXXX',
+           '00:xx:xx:00:00:xx VIVO-xxxx-0G',
+           '00:xx:xx:00:00:xx CLARO-xxxx-0G',
+           '00:XX:XX:XX:00:00 GVT-XXXX',
+           '00:00:XX:00:00:00 NET_0GXXXXXX',
+           '00:00:XX:00:00:00 CLARO_0GXXXXXX']
+
 
 # Obtém informações das redes próximas 
 
 def scan_results():
-    while True:
-        droid.wifiStartScan()
-        nets = droid.wifiGetScanResults()
-        
-        if len(nets[1]) > 0:
-            return nets[1]
+    if 'redes' not in locals():
+        while True:
+            droid.wifiStartScan()
+            nets = droid.wifiGetScanResults()
+
+            if len(nets[1]) > 0:
+                return nets[1]
 
 
 # Copia texto
-
 clip = droid.setClipboard
 
 
-# Verifica se o regex obteve algum valor 
-
-def reif(regex, string, quant=0):
-    from re import findall
-    
-    return len(findall(regex, string)) > quant
-
-
-# Tenta obter a senha padrão
-# com o mac + nome_da_rede
-
+# Tenta obter a senha padrão com o mac + nome_da_rede
 def getkeys(bid, eid=None):
     from re import sub
     
     global def_bid
     global def_eid
     
-    keys = []
+    passwd = []
 
-    if eid != None:
+    if eid is not None:
         masker = def_eid
         fakey = f'{bid} {eid}'
 
@@ -69,13 +63,12 @@ def getkeys(bid, eid=None):
         masker = def_bid
         fakey = bid
 
-    
     for index, mask in enumerate(masker):
         
         key = ''        
-        regex = sub(r'[0Xx]', r'.', mask)
+        regex = reg(mask, r'[0Xx]', r'.')
         
-        if reif(regex, fakey):
+        if reif(fakey, regex):
             
             for i, m in enumerate(mask):
                 if m == 'X':
@@ -84,29 +77,10 @@ def getkeys(bid, eid=None):
                 elif m == 'x':
                     key += fakey[i].lower()
                     
-            keys += [key]
+            passwd += [key]
             
-    return keys
+    return passwd
 
-
-# Limpa a tela    
-    
-def cl():
-    from subprocess import call
-    call('clear', shell=True)
-
-
-# Le um numero inteiro
-
-def read_int(prompt):
-    while True:
-        try:
-            return int(input(prompt))
-        except (ValueError, TypeError):
-            print('\033[1;31mTente novamente, digite um número inteiro\033[m')
-
-
-# Cria um menu
 
 def menu(*items):
     print(f'\033[34;1m]{"-"*15}[\033[31mWIHACK\033[34m]\n')
