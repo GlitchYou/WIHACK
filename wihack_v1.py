@@ -7,7 +7,8 @@ droid = androidhelper.Android()
 def_bid = [
         
 '00:XX:XX:XX:XX:XX',
-'00:00:XX:XX:XX:XX'
+'00:00:XX:XX:XX:XX',
+'xx:xx:xx:xx:xx:xx'
         
 ]
 	
@@ -17,6 +18,8 @@ def_bid = [
 def_eid = [
         
 '00:XX:XX:XX:00:00 VIVO-XXXX',
+# '00:xx:xx:00:00:xx VIVO-xxxx-0G',
+# '00:xx:xx:00:00:xx CLARO-xxxx-0G',
 '00:XX:XX:XX:00:00 GVT-XXXX',
 '00:00:XX:00:00:00 NET_0GXXXXXX',
 '00:00:XX:00:00:00 CLARO_0GXXXXXX'
