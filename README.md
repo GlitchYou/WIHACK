@@ -1,2 +1,18 @@
 # WIHACH
-Tenta obter a senha do wifi pelo mac + o nome da rede
+
+### TENTA CONECTA-SE EM REDES WI-FI
+
+    VIVOFIBRA-XXXX
+    VIVOFIBRA-XXXX-2G
+    VIVOFIBRA-XXXX-5G
+    CLARO-XXXX
+    VIVO-XXXX
+    VIVO-XXXX-2G
+    VIVO-XXXX-5G
+    GVT-XXXX
+    GVT-XXXX-2G
+    GVT-XXXX-5G
+    CLARO-2GXXXXXX
+    CLARO-5GXXXXXX
+    NET_2GXXXXXX
+    NET_5GXXXXXX
