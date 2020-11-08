@@ -19,8 +19,8 @@
     
     
 
-Se quiser me apoiar
+#### Se quiser me apoiar
 
-(Bitcoin Compatibility) 3QuZEz3msrXx1uu4DvpBu8jozzNUeKNwb6
-(Ether) 0xa11057B0328bF5eD5a1662e9fd0d5a8a8F17cC71
-(Dash) XktoTtjKbAb4YJkD5PFoPCXfnJT8rXDGZM
+ (Bitcoin Compatibility) 3QuZEz3msrXx1uu4DvpBu8jozzNUeKNwb6<br>
+ (Ether) 0xa11057B0328bF5eD5a1662e9fd0d5a8a8F17cC71<br>
+ (Dash) XktoTtjKbAb4YJkD5PFoPCXfnJT8rXDGZM<br>
